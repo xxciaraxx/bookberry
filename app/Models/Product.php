@@ -16,12 +16,14 @@ class Product extends Model
         'price',
         'image_path',
         'rating',
+        'stock',
         'is_active',
     ];
 
     protected $casts = [
         'price'     => 'decimal:2',
         'rating'    => 'decimal:2',
+        'stock'     => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -30,9 +32,32 @@ class Product extends Model
         if ($this->image_path && \Storage::disk('public')->exists($this->image_path)) {
             return asset('storage/' . $this->image_path);
         }
-
-        // Return a placeholder based on category
         return 'https://placehold.co/300x420/5A2A6E/CBA0D9?text=' . urlencode($this->title);
+    }
+
+    public function getIsInStockAttribute(): bool
+    {
+        return $this->stock > 0;
+    }
+
+    public function getStockStatusAttribute(): string
+    {
+        return match(true) {
+            $this->stock === 0      => 'Out of Stock',
+            $this->stock <= 3       => 'Last items in stock',
+            $this->stock <= 10      => 'Low stock',
+            default                 => 'In Stock',
+        };
+    }
+
+    public function getStockStatusColorAttribute(): string
+    {
+        return match(true) {
+            $this->stock === 0  => '#EF4444',
+            $this->stock <= 3   => '#F97316',
+            $this->stock <= 10  => '#EAB308',
+            default             => '#16A34A',
+        };
     }
 
     public function cartItems()
@@ -48,15 +73,5 @@ class Product extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
-    }
-
-    public function scopeWattpad($query)
-    {
-        return $query->where('category', 'wattpad');
-    }
-
-    public function scopeManga($query)
-    {
-        return $query->where('category', 'manga');
     }
 }

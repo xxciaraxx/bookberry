@@ -2,44 +2,42 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
 
 class AdminProductManager extends Component
 {
-    use WithFileUploads, WithPagination;
+    use WithFileUploads;
+    use WithPagination;
 
-    // Modal state
-    public bool   $showModal  = false;
-    public ?int   $editingId  = null;
+    public bool $showModal = false;
+    public ?int $editingId = null;
 
-    // Form fields
-    public string  $title       = '';
-    public string  $category    = 'wattpad';
-    public string  $description = '';
-    public string  $price       = '';
-    public string  $rating      = '0';
-    public bool    $is_active   = true;
-    public         $image;
+    public string $title = '';
+    public string $category = 'wattpad';
+    public string $description = '';
+    public string $price = '';
+    public string $rating = '0';
+    public string $stock = '10';
+    public bool $is_active = true;
+    public $image = null;
 
-    // Search
     public string $search = '';
 
     protected function rules(): array
     {
         return [
-            'title'       => 'required|string|max:255',
-            'category'    => 'required|in:wattpad,manga',
-            'price'       => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
+            'category' => 'required|in:wattpad,manga',
+            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:1000',
-            'rating'      => 'nullable|numeric|min:0|max:5',
-            'is_active'   => 'boolean',
-            'image'       => $this->editingId
-                ? 'nullable|image|max:2048'
-                : 'nullable|image|max:2048',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'stock' => 'required|integer|min:0',
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|max:2048',
         ];
     }
 
@@ -58,15 +56,15 @@ class AdminProductManager extends Component
     {
         $product = Product::findOrFail($id);
 
-        $this->editingId   = $id;
-        $this->title       = $product->title;
-        $this->category    = $product->category;
+        $this->editingId = $id;
+        $this->title = $product->title;
+        $this->category = $product->category;
         $this->description = $product->description ?? '';
-        $this->price       = (string) $product->price;
-        $this->rating      = (string) $product->rating;
-        $this->is_active   = $product->is_active;
-        $this->image       = null;
-
+        $this->price = (string) $product->price;
+        $this->rating = (string) $product->rating;
+        $this->stock = (string) $product->stock;
+        $this->is_active = $product->is_active;
+        $this->image = null;
         $this->showModal = true;
     }
 
@@ -83,31 +81,32 @@ class AdminProductManager extends Component
         if ($this->editingId) {
             $product = Product::findOrFail($this->editingId);
 
-            // Delete old image if replacing
             if ($imagePath && $product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
 
             $product->update([
-                'title'       => $this->title,
-                'category'    => $this->category,
+                'title' => $this->title,
+                'category' => $this->category,
                 'description' => $this->description,
-                'price'       => $this->price,
-                'rating'      => $this->rating ?: 0,
-                'is_active'   => $this->is_active,
+                'price' => $this->price,
+                'rating' => $this->rating ?: 0,
+                'stock' => $this->stock,
+                'is_active' => $this->is_active,
                 ...($imagePath ? ['image_path' => $imagePath] : []),
             ]);
 
             $this->dispatch('notify', message: 'Product updated successfully!');
         } else {
             Product::create([
-                'title'       => $this->title,
-                'category'    => $this->category,
+                'title' => $this->title,
+                'category' => $this->category,
                 'description' => $this->description,
-                'price'       => $this->price,
-                'rating'      => $this->rating ?: 0,
-                'is_active'   => $this->is_active,
-                'image_path'  => $imagePath,
+                'price' => $this->price,
+                'rating' => $this->rating ?: 0,
+                'stock' => $this->stock,
+                'is_active' => $this->is_active,
+                'image_path' => $imagePath,
             ]);
 
             $this->dispatch('notify', message: 'Product created successfully!');
@@ -132,26 +131,28 @@ class AdminProductManager extends Component
     public function toggleActive(int $id): void
     {
         $product = Product::findOrFail($id);
-        $product->update(['is_active' => !$product->is_active]);
+        $product->update(['is_active' => ! $product->is_active]);
+
         $this->dispatch('notify', message: 'Status updated.');
     }
 
     private function resetForm(): void
     {
         $this->reset(['editingId', 'title', 'description', 'price', 'image']);
-        $this->category  = 'wattpad';
-        $this->rating    = '0';
+        $this->category = 'wattpad';
+        $this->rating = '0';
+        $this->stock = '10';
         $this->is_active = true;
         $this->resetValidation();
     }
 
     public function render()
     {
-        $products = Product::when($this->search, fn($q) =>
-            $q->where('title', 'like', '%' . $this->search . '%')
-        )->latest()->paginate(10);
+        $products = Product::when($this->search, fn ($query) => $query->where('title', 'like', '%' . $this->search . '%'))
+            ->latest()
+            ->paginate(10);
 
         return view('livewire.admin.admin-product-manager', compact('products'))
-            ->layout('components.layout', ['title' => 'Admin — Products']);
+            ->layout('components.admin-layout', ['title' => 'Admin - Products']);
     }
 }

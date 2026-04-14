@@ -8,24 +8,27 @@ use App\Livewire\Admin\AdminProductManager;
 use App\Livewire\CartComponent;
 use App\Livewire\CheckoutComponent;
 use App\Livewire\LandingPage;
+use App\Livewire\ProductDetail;
 use App\Livewire\ProductList;
 use Illuminate\Support\Facades\Route;
 
+// ── Public ────────────────────────────────────────────────────
 Route::get('/', LandingPage::class)->name('home');
-
 Route::get('/products', ProductList::class)->name('products');
+Route::get('/products/{product}', ProductDetail::class)->name('product.show');
 
+// ── Authenticated Customer ────────────────────────────────────
 Route::middleware('auth')->group(function () {
     Route::get('/cart', CartComponent::class)->name('cart');
     Route::get('/checkout', CheckoutComponent::class)->name('checkout');
 
     Route::post('/logout', function (Logout $logout) {
         $logout();
-
         return redirect()->route('home');
     })->name('logout');
 });
 
+// ── Admin ─────────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
     Route::get('/products', AdminProductManager::class)->name('products');
@@ -33,11 +36,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/customers', AdminCustomers::class)->name('customers');
 });
 
-Route::get('dashboard', function () {
-    return auth()->user()?->isAdmin()
-        ? redirect()->route('admin.dashboard')
-        : redirect()->route('home');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ── Breeze defaults (keep as-is) ──────────────────────────────
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

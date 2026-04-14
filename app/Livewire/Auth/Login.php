@@ -24,7 +24,7 @@ class Login extends Component
         'password.required' => 'Please enter your password.',
     ];
 
-    public function login(): void
+    public function login()
     {
         $this->validate();
 
@@ -36,12 +36,9 @@ class Login extends Component
 
         session()->regenerate();
 
-        // Redirect admin to dashboard, customer to home
-        if (Auth::user()->isAdmin()) {
-            $this->redirect(route('admin.dashboard'), navigate: true);
-        } else {
-            $this->redirect(route('home'), navigate: true);
-        }
+        $targetRoute = Auth::user()->isAdmin() ? 'admin.dashboard' : 'home';
+
+        return redirect()->intended(route($targetRoute));
     }
 
     public function render()

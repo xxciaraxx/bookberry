@@ -19,7 +19,7 @@
                     Email Address
                 </label>
                 <input
-                    wire:model.live="email"
+                    wire:model.blur="email"
                     type="email"
                     placeholder="you@example.com"
                     autocomplete="email"
@@ -50,7 +50,7 @@
                 </div>
                 <div class="relative">
                     <input
-                        wire:model.live="password"
+                        wire:model.defer="password"
                         type="{{ $showPassword ? 'text' : 'password' }}"
                         placeholder="Enter your password"
                         autocomplete="current-password"
@@ -89,7 +89,7 @@
 
             {{-- Remember me --}}
             <label class="flex items-center gap-2 cursor-pointer">
-                <input wire:model="remember" type="checkbox"
+                <input wire:model.defer="remember" type="checkbox"
                     class="w-4 h-4 rounded accent-purple-700 cursor-pointer" />
                 <span class="text-sm text-gray-600">Remember me for 30 days</span>
             </label>
@@ -98,17 +98,18 @@
             <button
                 type="submit"
                 wire:loading.attr="disabled"
+                wire:target="login"
                 style="background: #5A2A6E;"
                 class="w-full text-white font-semibold py-3.5 rounded-xl hover:opacity-90
                     transition disabled:opacity-60 flex items-center justify-center gap-2 text-sm">
-                <span wire:loading.remove>Sign In to BookBerry</span>
-                <span wire:loading class="flex items-center gap-2">
+                <span wire:loading wire:target="login" class="flex items-center gap-2">
                     <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    Signing in...
                 </span>
+                <span wire:loading.remove wire:target="login">Sign In to BookBerry</span>
+                <span wire:loading wire:target="login">Signing in...</span>
             </button>
 
         </form>

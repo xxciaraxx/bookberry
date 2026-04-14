@@ -6,7 +6,7 @@
             Join BookBerry and start reading today. Free forever.
         </p>
 
-        <div class="space-y-4">
+        <form wire:submit="register" class="space-y-4">
 
             {{-- Full Name --}}
             <div>
@@ -14,7 +14,7 @@
                     Full Name
                 </label>
                 <input
-                    wire:model.live="name"
+                    wire:model.blur="name"
                     type="text"
                     placeholder="Juan dela Cruz"
                     autocomplete="name"
@@ -37,7 +37,7 @@
                     Email Address
                 </label>
                 <input
-                    wire:model.live.debounce.500ms="email"
+                    wire:model.blur="email"
                     type="email"
                     placeholder="you@example.com"
                     autocomplete="email"
@@ -191,7 +191,7 @@
 
             {{-- Terms --}}
             <label class="flex items-start gap-2.5 cursor-pointer">
-                <input wire:model="agreedToTerms" type="checkbox"
+                <input wire:model.defer="agreedToTerms" type="checkbox"
                     class="w-4 h-4 mt-0.5 rounded accent-purple-700 cursor-pointer shrink-0" />
                 <span class="text-sm text-gray-600 leading-relaxed">
                     I agree to the
@@ -211,21 +211,22 @@
 
             {{-- Submit --}}
             <button
-                wire:click="register"
+                type="submit"
                 wire:loading.attr="disabled"
+                wire:target="register"
                 style="background: #E94E77;"
                 class="w-full text-white font-semibold py-3.5 rounded-xl hover:opacity-90
                     transition disabled:opacity-60 flex items-center justify-center gap-2 text-sm">
-                <span wire:loading.remove>Create My Account</span>
-                <span wire:loading class="flex items-center gap-2">
+                <span wire:loading wire:target="register" class="flex items-center gap-2">
                     <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    Creating account...
                 </span>
+                <span wire:loading.remove wire:target="register">Create My Account</span>
+                <span wire:loading wire:target="register">Creating account...</span>
             </button>
-        </div>
+        </form>
 
         {{-- Divider --}}
         <div class="flex items-center gap-3 my-5">

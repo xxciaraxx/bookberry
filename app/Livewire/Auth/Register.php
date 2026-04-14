@@ -5,7 +5,6 @@ namespace App\Livewire\Auth;
 use Livewire\Component;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -96,9 +95,9 @@ class Register extends Component
         'agreedToTerms.accepted' => 'You must agree to the Terms of Service.',
     ];
 
-    public function register(): void
+    public function register()
     {
-        $validated = $this->validate();
+        $this->validate();
 
         $user = User::create([
             'name'     => $this->name,
@@ -108,9 +107,8 @@ class Register extends Component
         ]);
 
         event(new Registered($user));
-        Auth::login($user);
 
-        $this->redirect(route('home'), navigate: true);
+        return redirect()->route('login');
     }
 
     public function render()

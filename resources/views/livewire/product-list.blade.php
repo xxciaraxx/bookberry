@@ -29,14 +29,27 @@
                             Category
                         </label>
                         <div class="space-y-2">
-                            @foreach(['' => 'All Books', 'wattpad' => '📚 Wattpad', 'manga' => '🎌 Manga'] as $val => $label)
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <input type="radio" wire:model.live="category" value="{{ $val }}"
-                                        class="accent-purple-700" />
-                                    <span class="text-sm text-gray-700 group-hover:text-purple-700 transition">
+                            @foreach(['all' => 'All Books', 'wattpad' => 'Wattpad', 'manga' => 'Manga'] as $val => $label)
+                                <button
+                                    type="button"
+                                    wire:click="toggleCategory('{{ $val }}')"
+                                    class="w-full flex items-center gap-2 text-left group"
+                                >
+                                    <span class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition
+                                        {{ $category === $val ? 'border-blue-600' : 'border-gray-400 group-hover:border-purple-500' }}">
+                                        @if($category === $val)
+                                            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                        @endif
+                                    </span>
+                                    <span class="text-sm transition {{ $category === $val ? 'text-purple-800 font-medium' : 'text-gray-700 group-hover:text-purple-700' }}">
+                                        @if($val === 'wattpad')
+                                            📚
+                                        @elseif($val === 'manga')
+                                            🎌
+                                        @endif
                                         {{ $label }}
                                     </span>
-                                </label>
+                                </button>
                             @endforeach
                         </div>
                     </div>
@@ -67,14 +80,14 @@
                             class="w-full border border-purple-200 rounded-xl px-3 py-2 text-sm
                                 outline-none focus:border-purple-400 transition">
                             <option value="latest">Latest</option>
-                            <option value="price_asc">Price: Low → High</option>
-                            <option value="price_desc">Price: High → Low</option>
+                            <option value="price_asc">Price: Low to High</option>
+                            <option value="price_desc">Price: High to Low</option>
                             <option value="rating">Top Rated</option>
                         </select>
                     </div>
 
                     {{-- Reset --}}
-                    <button wire:click="resetFilters"
+                    <button type="button" wire:click="resetFilters"
                         class="w-full text-sm py-2 rounded-xl border border-purple-200 text-purple-700
                             hover:bg-purple-50 transition font-medium">
                         Reset All Filters
@@ -136,7 +149,6 @@
                                     {{ $product->title }}
                                 </p>
 
-                                {{-- Stars --}}
                                 <div class="flex items-center gap-0.5 my-1">
                                     @for($i = 1; $i <= 5; $i++)
                                         <span style="color: {{ $i <= round($product->rating) ? '#F59E0B' : '#E5E7EB' }}"
@@ -170,7 +182,7 @@
                         <div class="col-span-4 text-center py-20">
                             <p class="text-5xl mb-4">🔍</p>
                             <p class="font-semibold text-gray-500">No books found.</p>
-                            <button wire:click="resetFilters"
+                            <button type="button" wire:click="resetFilters"
                                 class="mt-3 text-sm hover:underline"
                                 style="color: #E94E77;">
                                 Clear filters
@@ -179,7 +191,6 @@
                     @endforelse
                 </div>
 
-                {{-- Pagination --}}
                 @if($products->hasPages())
                     <div class="mt-8">
                         {{ $products->links() }}

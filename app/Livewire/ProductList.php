@@ -13,14 +13,17 @@ class ProductList extends Component
     use WithPagination;
 
     public string $search   = '';
-    public string $category = '';
+    public string $category = 'all';
     public string $minPrice = '';
     public string $maxPrice = '';
     public string $sort     = 'latest';
 
     protected $queryString = [
         'search'   => ['except' => ''],
-        'category' => ['except' => ''],
+        'category' => ['except' => 'all'],
+        'minPrice' => ['except' => ''],
+        'maxPrice' => ['except' => ''],
+        'sort'     => ['except' => 'latest'],
     ];
 
     public function updatingSearch(): void
@@ -33,9 +36,34 @@ class ProductList extends Component
         $this->resetPage();
     }
 
+    public function toggleCategory(string $category): void
+    {
+        $this->category = $this->category === $category ? 'all' : $category;
+        $this->resetPage();
+    }
+
+    public function updatingMinPrice(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingMaxPrice(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSort(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters(): void
     {
-        $this->reset(['search', 'category', 'minPrice', 'maxPrice', 'sort']);
+        $this->search = '';
+        $this->category = 'all';
+        $this->minPrice = '';
+        $this->maxPrice = '';
+        $this->sort = 'latest';
         $this->resetPage();
     }
 
@@ -58,6 +86,7 @@ class ProductList extends Component
         }
 
         $this->dispatch('notify', message: 'Added to cart! 🛒');
+        $this->dispatch('cart-updated');
     }
 
     public function render()
@@ -68,7 +97,7 @@ class ProductList extends Component
             $query->where('title', 'like', '%' . $this->search . '%');
         }
 
-        if ($this->category) {
+        if ($this->category !== 'all') {
             $query->where('category', $this->category);
         }
 
