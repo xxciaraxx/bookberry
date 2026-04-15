@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use Livewire\Component;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -113,7 +114,12 @@ class Register extends Component
 
     public function render()
     {
-        return view('livewire.auth.register')
+        $heroProducts = Product::where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('livewire.auth.register', ['heroProducts' => $heroProducts])
             ->layout('components.auth-layout', ['title' => 'Create Account — BookBerry']);
     }
 }

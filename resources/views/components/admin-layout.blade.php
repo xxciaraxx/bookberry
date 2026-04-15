@@ -51,13 +51,16 @@
             class="fixed top-0 left-0 h-screen z-30 flex flex-col transition-transform duration-300
                 lg:translate-x-0 shrink-0 overflow-y-auto">
 
-            {{-- Logo --}}
-            <div class="px-5 py-5 border-b border-white/10">
-                <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold text-white">
-                    Book<span style="color: #CBA0D9;">Berry</span>
-                </a>
-                <p class="text-xs text-purple-300 mt-0.5">Admin Panel</p>
-            </div>
+	            {{-- Logo --}}
+	            <div class="px-5 py-5 border-b border-white/10">
+	                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-xl font-bold text-white">
+	                    <img src="{{ asset('images/bookberry-logo.svg') }}" alt="BookBerry" class="h-8 w-8" />
+	                    <span>
+	                        Book<span style="color: #CBA0D9;">Berry</span>
+	                    </span>
+	                </a>
+	                <p class="text-xs text-purple-300 mt-0.5">Admin Panel</p>
+	            </div>
 
             {{-- Navigation --}}
             <nav class="flex-1 p-3 space-y-1">

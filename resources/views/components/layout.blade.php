@@ -32,9 +32,12 @@
     <nav style="background: var(--bb-purple);" class="sticky top-0 z-50 px-4 md:px-8 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex items-center gap-3">
 
-            <a href="{{ route('home') }}" class="text-xl font-bold text-white tracking-wide shrink-0">
-                Book<span style="color: var(--bb-lavender);">Berry</span>
-            </a>
+	            <a href="{{ route('home') }}" class="flex items-center gap-2 text-xl font-bold text-white tracking-wide shrink-0">
+	                <img src="{{ asset('images/bookberry-logo.svg') }}" alt="BookBerry" class="h-8 w-8" />
+	                <span>
+	                    Book<span style="color: var(--bb-lavender);">Berry</span>
+	                </span>
+	            </a>
 
             <form action="{{ route('products') }}" method="GET"
                 class="flex flex-1 max-w-xl bg-white rounded-xl overflow-hidden mx-2">

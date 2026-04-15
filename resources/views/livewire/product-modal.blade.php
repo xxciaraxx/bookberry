@@ -6,50 +6,57 @@
      ============================================================ --}}
 
 <div>
-    @if($show && $product)
-        <div
-            wire:click="close"
-            class="fixed inset-0 z-40 bg-[#2a1438]/55 backdrop-blur-md"
-            x-data
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-        ></div>
+	    @if($show && $product)
+	        <div
+	            x-data="{
+	                lockScroll() { document.documentElement.classList.add('overflow-hidden') },
+	                unlockScroll() { document.documentElement.classList.remove('overflow-hidden') },
+	                close() { this.unlockScroll(); $wire.close() },
+	            }"
+	            x-init="lockScroll()"
+	            x-on:keydown.escape.window="close()"
+	        >
+	            <div
+	                class="fixed inset-0 z-40 bg-[#2a1438]/55 backdrop-blur-md"
+	                x-transition:enter="transition ease-out duration-200"
+	                x-transition:enter-start="opacity-0"
+	                x-transition:enter-end="opacity-100"
+	                x-transition:leave="transition ease-in duration-150"
+	                x-transition:leave-start="opacity-100"
+	                x-transition:leave-end="opacity-0"
+	                @click="close()"
+	            ></div>
 
-        <div
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
-            x-data
-            x-on:keydown.escape.window="$wire.close()"
-        >
-            <div
-                class="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/60 bg-[#fffaf5] shadow-[0_28px_90px_rgba(65,22,83,0.22)]"
-                x-transition:enter="transition ease-out duration-250"
-                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-95"
-                @click.stop
-            >
+	            <div
+	                class="fixed inset-0 z-50 flex items-center justify-center px-4 py-10 sm:px-6 sm:py-12"
+	            >
+		            <div
+		                class="relative w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/60 bg-[#fffaf5] shadow-[0_28px_90px_rgba(65,22,83,0.22)] 2xl:max-w-5xl"
+		                x-transition:enter="transition ease-out duration-250"
+		                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+		                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+		                x-transition:leave="transition ease-in duration-150"
+		                x-transition:leave-start="opacity-100 scale-100"
+		                x-transition:leave-end="opacity-0 scale-95"
+		                @click.stop
+		            >
                 <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-[#6d327e] via-[#8c58ab] to-[#ef5b87] opacity-10"></div>
 
-                <button
-                    wire:click="close"
-                    class="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadff0] bg-white/90 text-lg font-semibold leading-none text-[#6b5179] shadow-sm transition hover:bg-white hover:text-[#43204f]"
-                    aria-label="Close product modal"
-                >
-                    x
-                </button>
+	                <button
+	                    type="button"
+	                    @click="close()"
+	                    class="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadff0] bg-white/90 text-lg font-semibold leading-none text-[#6b5179] shadow-sm transition hover:bg-white hover:text-[#43204f]"
+	                    aria-label="Close product modal"
+	                >
+	                    x
+	                </button>
 
-                <div class="grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]">
-                    <div class="relative flex items-center justify-center bg-gradient-to-br from-[#f6e7f5] via-[#e7d4ef] to-[#d7c0e8] p-6 md:p-8">
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.8),_transparent_52%)]"></div>
-                        <div class="absolute left-6 top-6 rounded-full border border-white/70 bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7a5a89] backdrop-blur">
-                            BookBerry Pick
-                        </div>
+		                <div class="grid gap-0 lg:grid-cols-[320px_minmax(0,1fr)]">
+		                    <div class="relative flex items-center justify-center bg-gradient-to-br from-[#f6e7f5] via-[#e7d4ef] to-[#d7c0e8] p-6 md:p-8">
+		                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.8),_transparent_52%)]"></div>
+		                        <div class="absolute left-6 top-6 rounded-full border border-white/70 bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7a5a89] backdrop-blur">
+		                            BookBerry Pick
+		                        </div>
 
                         <div class="relative w-full max-w-[220px]">
                             <div class="absolute -inset-4 rounded-[2rem] bg-white/35 blur-2xl"></div>
@@ -77,12 +84,14 @@
                             <span class="inline-flex items-center rounded-full border border-[#ead9ef] bg-white px-3 py-1 text-xs font-medium text-[#7f678c]">
                                 SKU {{ str_pad($product->id, 6, '0', STR_PAD_LEFT) }}
                             </span>
-                        </div>
-
-                        <div class="max-w-2xl">
-                            <h2 class="text-3xl font-black leading-tight tracking-tight text-[#4d245f] sm:text-4xl">
-                                {{ $product->title }}
-                            </h2>
+	                        </div>
+	
+	                        <div class="max-w-2xl">
+	                            <h2 class="text-3xl font-black leading-tight tracking-tight text-[#4d245f] sm:text-4xl">
+	                                <span class="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
+	                                    {{ $product->title }}
+	                                </span>
+	                            </h2>
 
                             <div class="mt-3 flex flex-wrap items-center gap-3">
                                 <div class="flex items-center gap-1">
@@ -121,12 +130,12 @@
                                 @endif
                             </div>
 
-                            @if($product->description)
-                                <p class="mt-6 max-w-2xl text-[15px] leading-7 text-[#6c5c75]">
-                                    {{ Str::limit(trim(str_replace("\n", ' ', $product->description)), 220) }}
-                                </p>
-                            @endif
-                        </div>
+	                            @if($product->description)
+	                                <p class="mt-5 max-w-2xl text-[15px] leading-7 text-[#6c5c75] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+	                                    {{ Str::limit(trim(str_replace("\n", ' ', $product->description)), 160) }}
+	                                </p>
+	                            @endif
+	                        </div>
 
                         @if($product->stock > 0)
                             <div class="mt-8 rounded-[1.5rem] border border-[#f0e3f1] bg-white/85 p-5 shadow-[0_12px_30px_rgba(111,74,128,0.08)]">
@@ -162,39 +171,49 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-5">
-                                    @auth
-                                        <button
-                                            wire:click="addToCart"
-                                            wire:loading.attr="disabled"
-                                            wire:target="addToCart"
-                                            class="flex w-full items-center justify-center rounded-[1.15rem] bg-gradient-to-r from-[#ef4f7f] to-[#db4672] px-6 py-4 text-base font-bold text-white shadow-[0_16px_32px_rgba(232,79,124,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_34px_rgba(232,79,124,0.34)] disabled:opacity-60"
-                                        >
-                                            <span wire:loading.remove wire:target="addToCart">
-                                                {{ $addedToCart ? 'Added to Cart' : 'Add to Cart' }}
-                                            </span>
-                                            <span wire:loading wire:target="addToCart">
-                                                Adding...
-                                            </span>
-                                        </button>
-                                    @else
-                                        <a
-                                            href="{{ route('login') }}"
-                                            class="flex w-full items-center justify-center rounded-[1.15rem] bg-gradient-to-r from-[#ef4f7f] to-[#db4672] px-6 py-4 text-base font-bold text-white shadow-[0_16px_32px_rgba(232,79,124,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_34px_rgba(232,79,124,0.34)]"
-                                        >
-                                            Login to Buy
-                                        </a>
-                                    @endauth
-                                </div>
+	                                <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+	                                    <button
+	                                        type="button"
+	                                        @click="close()"
+	                                        class="flex w-full items-center justify-center rounded-[1.15rem] border border-[#eadcf0] bg-white px-6 py-4 text-base font-bold text-[#5a2a6e] shadow-sm transition hover:bg-[#fff8fd] sm:w-auto sm:px-7"
+	                                    >
+	                                        Close
+	                                    </button>
 
-                                @if($addedToCart)
-                                    <a
-                                        href="{{ route('cart') }}"
-                                        class="mt-3 flex w-full items-center justify-center rounded-[1.15rem] border border-[#eadcf0] bg-[#fff8fd] px-6 py-3 text-sm font-semibold text-[#5a2a6e] transition hover:bg-white"
-                                    >
-                                        View Cart
-                                    </a>
-                                @endif
+	                                    @auth
+	                                        <button
+	                                            wire:click="addToCart"
+	                                            wire:loading.attr="disabled"
+	                                            wire:target="addToCart"
+	                                            class="flex w-full flex-1 items-center justify-center rounded-[1.15rem] bg-gradient-to-r from-[#ef4f7f] to-[#db4672] px-6 py-4 text-base font-bold text-white shadow-[0_16px_32px_rgba(232,79,124,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_34px_rgba(232,79,124,0.34)] disabled:opacity-60"
+	                                        >
+	                                            <span wire:loading.remove wire:target="addToCart">
+	                                                {{ $addedToCart ? 'Added to Cart' : 'Add to Cart' }}
+	                                            </span>
+	                                            <span wire:loading wire:target="addToCart">
+	                                                Adding...
+	                                            </span>
+	                                        </button>
+	                                    @else
+	                                        <a
+	                                            href="{{ route('login') }}"
+	                                            @click="unlockScroll()"
+	                                            class="flex w-full flex-1 items-center justify-center rounded-[1.15rem] bg-gradient-to-r from-[#ef4f7f] to-[#db4672] px-6 py-4 text-base font-bold text-white shadow-[0_16px_32px_rgba(232,79,124,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_34px_rgba(232,79,124,0.34)]"
+	                                        >
+	                                            Login to Buy
+	                                        </a>
+	                                    @endauth
+	                                </div>
+
+	                                @if($addedToCart)
+	                                    <a
+	                                        href="{{ route('cart') }}"
+	                                        @click="unlockScroll()"
+	                                        class="mt-3 flex w-full items-center justify-center rounded-[1.15rem] border border-[#eadcf0] bg-[#fff8fd] px-6 py-3 text-sm font-semibold text-[#5a2a6e] transition hover:bg-white"
+	                                    >
+	                                        View Cart
+	                                    </a>
+	                                @endif
                             </div>
                         @else
                             <div class="mt-8 rounded-[1.5rem] border border-red-100 bg-red-50 px-5 py-4">
@@ -203,21 +222,10 @@
                             </div>
                         @endif
 
-                        @if($product->description)
-                            <div class="mt-8 border-t border-[#eadfec] pt-6">
-                                <h3 class="text-sm font-bold uppercase tracking-[0.18em] text-[#977fa3]">About this item</h3>
-                                <div class="mt-4 space-y-3 text-sm leading-7 text-[#6d5c76]">
-                                    @foreach(explode("\n", $product->description) as $para)
-                                        @if(trim($para))
-                                            <p>{{ trim($para) }}</p>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-</div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	        </div>
+	    @endif
+	</div>

@@ -18,7 +18,7 @@ class AdminDashboard extends Component
         $days = (int) $this->period;
         $since = now()->subDays($days);
 
-        // ── Key Metrics ──────────────────────────────────────
+        // â”€â”€ Key Metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $totalRevenue = Order::where('status', '!=', 'cancelled')
             ->where('created_at', '>=', $since)
             ->sum('total_amount');
@@ -34,13 +34,13 @@ class AdminDashboard extends Component
 
         $pendingOrders = Order::where('status', 'pending')->count();
 
-        // ── Recent Orders ─────────────────────────────────────
+        // â”€â”€ Recent Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $recentOrders = Order::with('user')
             ->latest()
             ->take(8)
             ->get();
 
-        // ── Top Selling Products ──────────────────────────────
+        // â”€â”€ Top Selling Products â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $topProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->select(
@@ -56,12 +56,12 @@ class AdminDashboard extends Component
             ->take(5)
             ->get();
 
-        // ── Orders by Status ──────────────────────────────────
+        // â”€â”€ Orders by Status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $ordersByStatus = Order::select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
 
-        // ── Revenue by Category ───────────────────────────────
+        // â”€â”€ Revenue by Category â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $revenueByCategory = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -76,7 +76,7 @@ class AdminDashboard extends Component
             ->get()
             ->keyBy('category');
 
-        // ── Daily Revenue (last 7 days) ───────────────────────
+        // â”€â”€ Daily Revenue (last 7 days) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $dailyRevenue = Order::where('status', '!=', 'cancelled')
             ->where('created_at', '>=', now()->subDays(7))
             ->select(
@@ -88,7 +88,7 @@ class AdminDashboard extends Component
             ->orderBy('date')
             ->get();
 
-        // ── Recent Customers ──────────────────────────────────
+        // â”€â”€ Recent Customers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $recentCustomers = User::where('is_admin', false)
             ->latest()
             ->take(5)
@@ -98,6 +98,9 @@ class AdminDashboard extends Component
             'totalRevenue', 'totalOrders', 'newCustomers', 'totalProducts',
             'activeProducts', 'pendingOrders', 'recentOrders', 'topProducts',
             'ordersByStatus', 'revenueByCategory', 'dailyRevenue', 'recentCustomers'
-        ))->layout('components.admin-layout', ['title' => 'Dashboard — BookBerry Admin']);
+        ))->layout('components.admin-layout', [
+            'title' => 'Dashboard - BookBerry Admin',
+            'pageTitle' => 'Dashboard Overview',
+        ]);
     }
 }

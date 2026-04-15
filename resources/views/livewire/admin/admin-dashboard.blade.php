@@ -1,11 +1,8 @@
-<x-admin-layout title="Dashboard — BookBerry Admin" pageTitle="Dashboard Overview">
-
-    <div> 
-
-        {{-- Period selector --}}
+﻿        {{-- Period selector --}}
+<div>
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-xl font-bold text-gray-800">Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 17 ? 'afternoon' : 'evening') }}, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h2>
+                <h2 class="text-xl font-bold text-gray-800">Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 17 ? 'afternoon' : 'evening') }}, {{ explode(' ', auth()->user()->name)[0] }}! ðŸ‘‹</h2>
                 <p class="text-sm text-gray-500 mt-0.5">Here's what's happening with your store.</p>
             </div>
             <div class="flex items-center gap-2">
@@ -19,7 +16,6 @@
                 </select>
             </div>
         </div>
-
         {{-- ===== STAT CARDS ===== --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
@@ -35,7 +31,7 @@
                     </div>
                     <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">Revenue</span>
                 </div>
-                <p class="text-2xl font-bold text-gray-800">₱{{ number_format($totalRevenue, 0) }}</p>
+                <p class="text-2xl font-bold text-gray-800">â‚±{{ number_format($totalRevenue, 0) }}</p>
                 <p class="text-xs text-gray-400 mt-1">Last {{ $period }} days</p>
             </div>
 
@@ -99,7 +95,7 @@
             <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                 <h3 class="font-semibold text-gray-700 mb-4 text-sm">Revenue by Category</h3>
 
-                @foreach(['wattpad' => ['📚', '#9D174D', '#FDF2F8'], 'manga' => ['🎌', '#4338CA', '#EEF2FF']] as $cat => [$icon, $color, $bg])
+                @foreach(['wattpad' => ['ðŸ“š', '#9D174D', '#FDF2F8'], 'manga' => ['ðŸŽŒ', '#4338CA', '#EEF2FF']] as $cat => [$icon, $color, $bg])
                     @php
                         $data = $revenueByCategory[$cat] ?? null;
                         $rev = $data?->revenue ?? 0;
@@ -111,7 +107,7 @@
                         <div class="flex justify-between items-center mb-1.5">
                             <span class="text-sm font-medium text-gray-700">{{ $icon }} {{ ucfirst($cat) }}</span>
                             <div class="text-right">
-                                <span class="text-sm font-bold text-gray-800">₱{{ number_format($rev, 0) }}</span>
+                                <span class="text-sm font-bold text-gray-800">â‚±{{ number_format($rev, 0) }}</span>
                                 <span class="text-xs text-gray-400 ml-1">({{ $units }} sold)</span>
                             </div>
                         </div>
@@ -125,7 +121,7 @@
 
                 <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between text-sm">
                     <span class="text-gray-500 font-medium">Total</span>
-                    <span class="font-bold text-gray-800">₱{{ number_format($revenueByCategory->sum('revenue'), 0) }}</span>
+                    <span class="font-bold text-gray-800">â‚±{{ number_format($revenueByCategory->sum('revenue'), 0) }}</span>
                 </div>
             </div>
 
@@ -135,10 +131,10 @@
 
                 @php
                     $statusConfig = [
-                        'pending'    => ['🟡', '#D97706', '#FEF3C7', 'Pending'],
-                        'processing' => ['🔵', '#2563EB', '#EFF6FF', 'Processing'],
-                        'completed'  => ['🟢', '#16A34A', '#F0FDF4', 'Completed'],
-                        'cancelled'  => ['🔴', '#DC2626', '#FEF2F2', 'Cancelled'],
+                        'pending'    => ['ðŸŸ¡', '#D97706', '#FEF3C7', 'Pending'],
+                        'processing' => ['ðŸ”µ', '#2563EB', '#EFF6FF', 'Processing'],
+                        'completed'  => ['ðŸŸ¢', '#16A34A', '#F0FDF4', 'Completed'],
+                        'cancelled'  => ['ðŸ”´', '#DC2626', '#FEF2F2', 'Cancelled'],
                     ];
                     $grandTotal = $ordersByStatus->sum() ?: 1;
                 @endphp
@@ -174,7 +170,7 @@
 
                 @if($dailyRevenue->isEmpty())
                     <div class="text-center py-8 text-gray-400">
-                        <p class="text-3xl mb-2">📊</p>
+                        <p class="text-3xl mb-2">ðŸ“Š</p>
                         <p class="text-xs">No revenue data yet</p>
                     </div>
                 @else
@@ -186,12 +182,12 @@
                                 <div class="relative w-full">
                                     <div class="w-full rounded-t-md transition-all hover:opacity-80 cursor-pointer"
                                         style="height: {{ $h }}px; background: #5A2A6E;"
-                                        title="{{ $day->date }}: ₱{{ number_format($day->revenue, 2) }}">
+                                        title="{{ $day->date }}: â‚±{{ number_format($day->revenue, 2) }}">
                                     </div>
                                     <div class="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white
                                         text-xs rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100
                                         transition whitespace-nowrap pointer-events-none">
-                                        ₱{{ number_format($day->revenue, 0) }}
+                                        â‚±{{ number_format($day->revenue, 0) }}
                                     </div>
                                 </div>
                             </div>
@@ -218,7 +214,7 @@
                 <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 class="font-semibold text-gray-700 text-sm">Recent Orders</h3>
                     <a href="{{ route('admin.orders') }}" style="color: #E94E77;"
-                        class="text-xs font-medium hover:underline">View all →</a>
+                        class="text-xs font-medium hover:underline">View all â†’</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -249,7 +245,7 @@
                                         </div>
                                     </td>
                                     <td class="px-5 py-3 font-semibold" style="color: #E94E77;">
-                                        ₱{{ number_format($order->total_amount, 2) }}
+                                        â‚±{{ number_format($order->total_amount, 2) }}
                                     </td>
                                     <td class="px-5 py-3">
                                         @php
@@ -289,7 +285,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-700 text-sm">Top Products</h3>
                         <a href="{{ route('admin.products') }}" style="color: #E94E77;"
-                            class="text-xs font-medium hover:underline">Manage →</a>
+                            class="text-xs font-medium hover:underline">Manage â†’</a>
                     </div>
                     <div class="space-y-3">
                         @forelse($topProducts as $i => $p)
@@ -305,7 +301,7 @@
                                     <p class="text-xs text-gray-400">{{ $p->total_sold }} sold</p>
                                 </div>
                                 <span class="text-xs font-bold shrink-0" style="color: #E94E77;">
-                                    ₱{{ number_format($p->revenue, 0) }}
+                                    â‚±{{ number_format($p->revenue, 0) }}
                                 </span>
                             </div>
                         @empty
@@ -319,7 +315,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-700 text-sm">Recent Customers</h3>
                         <a href="{{ route('admin.customers') }}" style="color: #E94E77;"
-                            class="text-xs font-medium hover:underline">View all →</a>
+                            class="text-xs font-medium hover:underline">View all â†’</a>
                     </div>
                     <div class="space-y-3">
                         @foreach($recentCustomers as $customer)
@@ -342,6 +338,4 @@
 
             </div>
         </div>
-    <div>
-
-</x-admin-layout>
+</div>

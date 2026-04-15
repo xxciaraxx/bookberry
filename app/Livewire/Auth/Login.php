@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use Livewire\Component;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -43,7 +44,12 @@ class Login extends Component
 
     public function render()
     {
-        return view('livewire.auth.login')
+        $heroProducts = Product::where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('livewire.auth.login', ['heroProducts' => $heroProducts])
             ->layout('components.auth-layout', ['title' => 'Sign In — BookBerry']);
     }
 }

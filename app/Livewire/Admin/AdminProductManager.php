@@ -153,6 +153,9 @@ class AdminProductManager extends Component
             ->paginate(10);
 
         return view('livewire.admin.admin-product-manager', compact('products'))
-            ->layout('components.admin-layout', ['title' => 'Admin - Products']);
+            ->layout('components.admin-layout', [
+                'title' => 'Products - BookBerry Admin',
+                'pageTitle' => 'Product Management',
+            ]);
     }
 }

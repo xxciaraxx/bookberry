@@ -24,7 +24,12 @@ class LandingPage extends Component
 
         $products = $query->latest()->take(8)->get();
 
-        return view('livewire.landing-page', compact('products'))
+        $heroProducts = Product::where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('livewire.landing-page', compact('products', 'heroProducts'))
             ->layout('components.layout', ['title' => 'BookBerry — Home']);
     }
 }

@@ -14,25 +14,34 @@
                 <p style="color: #CBA0D9;" class="text-lg mb-8 leading-relaxed">
                     Discover Filipino Wattpad stories and Japanese manga, all in one place.
                 </p>
-                <div class="flex flex-wrap gap-3">
-                    @guest
-                        <a href="{{ route('register') }}" style="background: #E94E77;"
-                            class="text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition text-sm">
-                            Get Started
-                        </a>
-                        <a href="{{ route('login') }}"
-                            class="text-white/80 font-semibold px-8 py-3 rounded-xl border border-white/30
-                                hover:bg-white/10 transition text-sm">
-                            Sign In
-                        </a>
-                    @endguest
-                    @auth
-                        <a href="{{ route('products') }}" style="background: #E94E77;"
-                            class="text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition text-sm">
-                            Browse All Books
-                        </a>
-                    @endauth
-                </div>
+	                <div class="flex flex-wrap gap-3">
+	                    @guest
+	                        <a href="{{ route('register') }}" style="background: #E94E77;"
+	                            class="text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition text-sm inline-flex items-center gap-2">
+	                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+	                            </svg>
+	                            Get Started
+	                        </a>
+	                        <a href="{{ route('login') }}"
+	                            class="text-white/80 font-semibold px-8 py-3 rounded-xl border border-white/30
+	                                hover:bg-white/10 transition text-sm inline-flex items-center gap-2">
+	                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.314 0-6 1.79-6 4v1h12v-1c0-2.21-2.686-4-6-4z"/>
+	                            </svg>
+	                            Sign In
+	                        </a>
+	                    @endguest
+	                    @auth
+	                        <a href="{{ route('products') }}" style="background: #E94E77;"
+	                            class="text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition text-sm inline-flex items-center gap-2">
+	                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+	                            </svg>
+	                            Browse All Books
+	                        </a>
+	                    @endauth
+	                </div>
                 <div class="flex flex-wrap gap-2 mt-6">
                     <span class="text-xs px-3 py-1 rounded-full border border-white/20 text-white/70">Wattpad Books</span>
                     <span class="text-xs px-3 py-1 rounded-full border border-white/20 text-white/70">Japanese Manga</span>
@@ -40,48 +49,76 @@
                     <span class="text-xs px-3 py-1 rounded-full border border-white/20 text-white/70">Cash on Delivery</span>
                 </div>
             </div>
-            <div class="hidden md:flex items-end gap-3 shrink-0">
-                @foreach([
-                    ['Ang Probinsyano', '#E94E77', '-5deg'],
-                    ['One Piece', '#3B82F6', '2deg'],
-                    ['Mahal Kita Boss', '#059669', '-2deg'],
-                    ['Demon Slayer', '#7C3AED', '4deg'],
-                ] as [$title, $color, $rotate])
-                    <div style="background: {{ $color }}; transform: rotate({{ $rotate }});"
-                        class="w-20 h-28 rounded-xl shadow-2xl flex items-center justify-center
-                            text-white text-xs font-semibold text-center p-2 leading-tight">
-                        {{ $title }}
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
+	            <div class="hidden md:flex items-end gap-3 shrink-0">
+	                @php $rotations = ['-5deg', '2deg', '-2deg', '4deg']; @endphp
+
+	                @if(($heroProducts ?? collect())->count())
+	                    @foreach($heroProducts as $idx => $hero)
+	                        <div style="transform: rotate({{ $rotations[$idx] ?? '0deg' }});"
+	                            class="w-20 h-28 rounded-xl shadow-2xl overflow-hidden bg-white/10 border border-white/20">
+	                            <img
+	                                src="{{ $hero->image_url }}"
+	                                alt="{{ $hero->title }}"
+	                                class="w-full h-full object-cover"
+	                                loading="lazy"
+	                            />
+	                        </div>
+	                    @endforeach
+	                @else
+	                    @foreach([
+	                        ['Ang Probinsyano', '#E94E77', '-5deg'],
+	                        ['One Piece', '#3B82F6', '2deg'],
+	                        ['Mahal Kita Boss', '#059669', '-2deg'],
+	                        ['Demon Slayer', '#7C3AED', '4deg'],
+	                    ] as [$title, $color, $rotate])
+	                        <div style="background: {{ $color }}; transform: rotate({{ $rotate }});"
+	                            class="w-20 h-28 rounded-xl shadow-2xl flex items-center justify-center
+	                                text-white text-xs font-semibold text-center p-2 leading-tight">
+	                            {{ $title }}
+	                        </div>
+	                    @endforeach
+	                @endif
+	            </div>
+	        </div>
+	    </section>
 
     {{-- ===== CATEGORY BANNERS ===== --}}
     <section class="max-w-6xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="{{ route('products') }}?category=wattpad"
-                class="relative overflow-hidden rounded-2xl p-6 flex items-center gap-4 hover:opacity-95 transition"
-                style="background: linear-gradient(135deg, #9D174D 0%, #E94E77 100%);">
-                <div class="text-5xl">WB</div>
-                <div class="text-white">
-                    <h3 class="font-bold text-xl">Wattpad Books</h3>
-                    <p class="text-sm text-white/80">Filipino romance and fiction stories</p>
-                </div>
-                <span class="ml-auto text-white/80 text-2xl">></span>
-            </a>
-            <a href="{{ route('products') }}?category=manga"
-                class="relative overflow-hidden rounded-2xl p-6 flex items-center gap-4 hover:opacity-95 transition"
-                style="background: linear-gradient(135deg, #1e3a5f 0%, #3B82F6 100%);">
-                <div class="text-5xl">MG</div>
-                <div class="text-white">
-                    <h3 class="font-bold text-xl">Japanese Manga</h3>
-                    <p class="text-sm text-white/80">Action, romance, fantasy and more</p>
-                </div>
-                <span class="ml-auto text-white/80 text-2xl">></span>
-            </a>
-        </div>
-    </section>
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	            <a href="{{ route('products') }}?category=wattpad"
+	                class="relative overflow-hidden rounded-2xl p-6 flex items-center gap-4 hover:opacity-95 transition"
+	                style="background: linear-gradient(135deg, #9D174D 0%, #E94E77 100%);">
+		                <div class="text-5xl flex items-center gap-3">
+		                    <span class="opacity-90" aria-hidden="true">📚</span>
+		                </div>
+	                <div class="text-white">
+	                    <h3 class="font-bold text-xl">Wattpad Books</h3>
+	                    <p class="text-sm text-white/80">Filipino romance and fiction stories</p>
+	                </div>
+	                <span class="ml-auto text-white/80">
+	                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+	                    </svg>
+	                </span>
+	            </a>
+	            <a href="{{ route('products') }}?category=manga"
+	                class="relative overflow-hidden rounded-2xl p-6 flex items-center gap-4 hover:opacity-95 transition"
+	                style="background: linear-gradient(135deg, #1e3a5f 0%, #3B82F6 100%);">
+		                <div class="text-5xl flex items-center gap-3">
+		                    <span class="opacity-90" aria-hidden="true">🇯🇵</span>
+		                </div>
+	                <div class="text-white">
+	                    <h3 class="font-bold text-xl">Japanese Manga</h3>
+	                    <p class="text-sm text-white/80">Action, romance, fantasy and more</p>
+	                </div>
+	                <span class="ml-auto text-white/80">
+	                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+	                    </svg>
+	                </span>
+	            </a>
+	        </div>
+	    </section>
 
     {{-- ===== JUST FOR YOU ===== --}}
     <section class="max-w-6xl mx-auto px-4 pb-12">
