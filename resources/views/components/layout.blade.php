@@ -14,19 +14,15 @@
             --bb-cream:    #FFF8F2;
             --bb-charcoal: #2E2E2E;
         }
-
         body {
             background-color: var(--bb-cream);
             color: var(--bb-charcoal);
             font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
-
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bb-cream); }
         ::-webkit-scrollbar-thumb { background: var(--bb-lavender); border-radius: 3px; }
-
-        /* Livewire loading indicator */
         [wire\:loading] { opacity: 0.6; pointer-events: none; }
     </style>
 </head>
@@ -36,86 +32,70 @@
     <nav style="background: var(--bb-purple);" class="sticky top-0 z-50 px-4 md:px-8 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex items-center gap-3">
 
-            {{-- Logo --}}
             <a href="{{ route('home') }}" class="text-xl font-bold text-white tracking-wide shrink-0">
                 Book<span style="color: var(--bb-lavender);">Berry</span>
             </a>
 
-            {{-- Search bar --}}
             <form action="{{ route('products') }}" method="GET"
                 class="flex flex-1 max-w-xl bg-white rounded-xl overflow-hidden mx-2">
-                <input
-                    name="search"
-                    type="text"
-                    placeholder="Search books, manga, Wattpad stories..."
+                <input name="search" type="text" placeholder="Search books, manga, Wattpad stories..."
                     value="{{ request('search') }}"
-                    class="flex-1 px-4 py-2 text-sm outline-none text-gray-700 bg-transparent"
-                />
-                <button type="submit"
-                    style="background: var(--bb-pink);"
+                    class="flex-1 px-4 py-2 text-sm outline-none text-gray-700 bg-transparent" />
+                <button type="submit" style="background: var(--bb-pink);"
                     class="text-white px-4 py-2 text-sm font-semibold hover:opacity-90 transition shrink-0">
                     Search
                 </button>
             </form>
 
-            {{-- Nav links --}}
             <div class="ml-auto flex items-center gap-3 text-sm shrink-0">
                 @guest
-                    <a href="{{ route('login') }}"
-                        class="text-white/80 hover:text-white font-medium transition">
-                        Login
-                    </a>
-                    <a href="{{ route('register') }}"
-                        style="background: var(--bb-pink);"
-                        class="text-white px-4 py-1.5 rounded-xl font-medium hover:opacity-90 transition">
-                        Register
-                    </a>
+                    <a href="{{ route('login') }}" class="text-white/80 hover:text-white font-medium transition">Login</a>
+                    <a href="{{ route('register') }}" style="background: var(--bb-pink);"
+                        class="text-white px-4 py-1.5 rounded-xl font-medium hover:opacity-90 transition">Register</a>
                 @endguest
 
                 @auth
-                    <livewire:cart-counter />
+                    <a href="{{ route('cart') }}" class="relative text-white/80 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        @php $cartCount = auth()->user()->cart?->items->sum('quantity') ?? 0; @endphp
+                        @if($cartCount > 0)
+                            <span style="background: var(--bb-pink);"
+                                class="absolute -top-2 -right-2 text-white text-xs rounded-full
+                                    w-5 h-5 flex items-center justify-center font-bold">
+                                {{ $cartCount > 9 ? '9+' : $cartCount }}
+                            </span>
+                        @endif
+                    </a>
 
-                    {{-- User dropdown --}}
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
                             class="flex items-center gap-1.5 text-white/80 hover:text-white transition">
                             <div style="background: var(--bb-lavender);"
-                                class="w-7 h-7 rounded-full flex items-center justify-center
-                                    text-xs font-bold text-purple-900">
+                                class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-purple-900">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-
                         <div x-show="open" @click.outside="open = false" x-transition
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg
-                                border border-purple-100 py-1 z-50">
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-purple-100 py-1 z-50">
                             <div class="px-4 py-2 border-b border-purple-50">
                                 <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-gray-400">{{ auth()->user()->email }}</p>
                             </div>
-
-                            <a href="{{ route('products') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
-                                Browse Books
-                            </a>
-                            <a href="{{ route('cart') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
-                                My Cart
-                            </a>
-
+                            <a href="{{ route('products') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Browse Books</a>
+                            <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">My Cart</a>
                             @if(auth()->user()->isAdmin())
                                 <div class="border-t border-purple-50 mt-1">
-                                    <a href="{{ route('admin.products') }}"
+                                    <a href="{{ route('admin.dashboard') }}"
                                         class="block px-4 py-2 text-sm font-medium hover:bg-purple-50"
-                                        style="color: var(--bb-purple);">
-                                        Admin Panel
-                                    </a>
+                                        style="color: var(--bb-purple);">Admin Panel</a>
                                 </div>
                             @endif
-
                             <div class="border-t border-purple-50 mt-1">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -132,7 +112,7 @@
         </div>
     </nav>
 
-    {{-- ===== MAIN CONTENT ===== --}}
+    {{-- ===== MAIN ===== --}}
     <main class="flex-1">
         {{ $slot }}
     </main>
@@ -171,23 +151,18 @@
         </div>
     </footer>
 
-    @livewireScripts
+    {{-- ===== GLOBAL PRODUCT MODAL (mounted once here) ===== --}}
+    <livewire:product-modal />
 
-    {{-- Global toast notification (Alpine.js) --}}
+    {{-- ===== GLOBAL TOAST ===== --}}
     <div
-        x-data="{ show: false, message: '', type: 'success' }"
-        @notify.window="
-            message = $event.detail.message;
-            type = $event.detail.type ?? 'success';
-            show = true;
-            setTimeout(() => show = false, 3000)
-        "
+        x-data="{ show: false, message: '' }"
+        @notify.window="message = $event.detail.message; show = true; setTimeout(() => show = false, 3000)"
         x-show="show"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4"
         x-transition:enter-end="opacity-100 translate-y-0"
         x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         style="background: var(--bb-purple);"
         class="fixed bottom-6 right-6 z-50 text-white px-5 py-3 rounded-2xl shadow-xl
@@ -197,5 +172,6 @@
         <span x-text="message"></span>
     </div>
 
+    @livewireScripts
 </body>
 </html>
