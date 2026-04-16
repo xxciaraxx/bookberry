@@ -1,3 +1,4 @@
+<div>
 <div class="flex items-center justify-between mb-5">
     <div class="relative max-w-sm flex-1">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -65,6 +66,6 @@
         <div class="px-5 py-4 border-t border-gray-100">
             {{ $customers->links() }}
         </div>
-    @endif
+	    @endif
+	</div>
 </div>
-

@@ -10,11 +10,18 @@ class Order extends Model
         'user_id',
         'total_amount',
         'status',
+        'approval_status',
         'shipping_address',
+        'approved_at',
+        'approved_by',
+        'rejected_at',
+        'rejected_by',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'approved_at'  => 'datetime',
+        'rejected_at'  => 'datetime',
     ];
 
     public function user()
@@ -25,5 +32,15 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
     }
 }

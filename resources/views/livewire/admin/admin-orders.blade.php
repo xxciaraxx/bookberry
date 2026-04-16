@@ -1,5 +1,6 @@
-{{-- Filters --}}
-<div class="flex flex-col sm:flex-row gap-3 mb-5">
+<div>
+	{{-- Filters --}}
+	<div class="flex flex-col sm:flex-row gap-3 mb-5">
     <div class="relative flex-1 max-w-sm">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,18 +26,23 @@
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
     <table class="w-full text-sm">
         <thead class="bg-gray-50">
-            <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                <th class="px-5 py-3 text-left font-semibold">Order #</th>
-                <th class="px-5 py-3 text-left font-semibold">Customer</th>
-                <th class="px-5 py-3 text-left font-semibold">Amount</th>
-                <th class="px-5 py-3 text-left font-semibold">Status</th>
-                <th class="px-5 py-3 text-left font-semibold">Address</th>
-                <th class="px-5 py-3 text-left font-semibold">Date</th>
+	            <tr class="text-xs text-gray-500 uppercase tracking-wide">
+	                <th class="px-5 py-3 text-left font-semibold">Order #</th>
+	                <th class="px-5 py-3 text-left font-semibold">Customer</th>
+	                <th class="px-5 py-3 text-left font-semibold">Amount</th>
+	                <th class="px-5 py-3 text-left font-semibold">Status</th>
+	                <th class="px-5 py-3 text-left font-semibold">Address</th>
+	                <th class="px-5 py-3 text-left font-semibold">Date</th>
+	                <th class="px-5 py-3 text-left font-semibold">Approval</th>
                 <th class="px-5 py-3 text-left font-semibold">Actions</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
             @forelse($orders as $order)
+                @php
+                    $approvalStatus = $order->approval_status
+                        ?? ($order->approved_at ? 'approved' : ($order->rejected_at ? 'rejected' : 'pending'));
+                @endphp
                 <tr class="hover:bg-gray-50/50 transition">
                     <td class="px-5 py-3 font-mono font-semibold text-gray-700 text-xs">
                         #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
@@ -65,27 +71,70 @@
                     <td class="px-5 py-3 text-xs text-gray-500 max-w-[160px] truncate">
                         {{ $order->shipping_address ?? '—' }}
                     </td>
-                    <td class="px-5 py-3 text-xs text-gray-400">
-                        {{ $order->created_at->format('M d, Y') }}<br>
-                        <span class="text-gray-300">{{ $order->created_at->format('h:i A') }}</span>
+	                    <td class="px-5 py-3 text-xs text-gray-400">
+	                        {{ $order->created_at->format('M d, Y') }}<br>
+	                        <span class="text-gray-300">{{ $order->created_at->format('h:i A') }}</span>
+	                    </td>
+                    <td class="px-5 py-3">
+                        @if($approvalStatus === 'approved')
+                            <span class="text-xs font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+                                Approved
+                            </span>
+                            <div class="text-[10px] text-gray-400 mt-1 leading-tight">
+                                <div>{{ $order->approved_at->format('M d, Y h:i A') }}</div>
+                                @if($order->approvedBy)
+                                    <div>by {{ $order->approvedBy->name }}</div>
+                                @endif
+                            </div>
+                        @elseif($approvalStatus === 'rejected')
+                            <span class="text-xs font-semibold bg-red-50 text-red-700 px-2 py-0.5 rounded-full">
+                                Rejected
+                            </span>
+                            @if($order->rejected_at)
+                                <div class="text-[10px] text-gray-400 mt-1 leading-tight">
+                                    <div>{{ $order->rejected_at->format('M d, Y h:i A') }}</div>
+                                    @if($order->rejectedBy)
+                                        <div>by {{ $order->rejectedBy->name }}</div>
+                                    @endif
+                                </div>
+                            @endif
+                        @else
+                            <span class="text-xs font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                                Not approved
+                            </span>
+                        @endif
                     </td>
                     <td class="px-5 py-3">
-                        <select wire:change="updateStatus({{ $order->id }}, $event.target.value)"
-                            class="border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none bg-white">
-                            @foreach(['pending', 'processing', 'completed', 'cancelled'] as $st)
-                                <option value="{{ $st }}" {{ $order->status === $st ? 'selected' : '' }}>
-                                    {{ ucfirst($st) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="flex items-center gap-2">
+                            @if($approvalStatus === 'pending')
+                                <button type="button" wire:click="approveOrder({{ $order->id }})"
+                                    class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition"
+                                    wire:loading.attr="disabled">
+                                    Approve
+                                </button>
+                                <button type="button" wire:click="rejectOrder({{ $order->id }})"
+                                    class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                                    wire:loading.attr="disabled">
+                                    Reject
+                                </button>
+                            @elseif($approvalStatus === 'approved')
+                                <span class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-green-50 text-green-700">
+                                    Approved
+                                </span>
+                            @else
+                                <span class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-50 text-red-700">
+                                    Rejected
+                                </span>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center py-16 text-gray-400">
-                        <p class="text-4xl mb-2">📭</p>
-                        <p class="text-sm">No orders found.</p>
-                    </td>
+	                    <td colspan="8" class="text-center py-16 text-gray-400">
+	                        <p class="text-4xl mb-2">📭</p>
+	                        <p class="text-sm">No orders found.</p>
+	                    </td>
                 </tr>
             @endforelse
         </tbody>
@@ -96,4 +145,4 @@
         </div>
     @endif
 </div>
-
+</div>
