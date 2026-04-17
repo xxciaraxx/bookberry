@@ -13,16 +13,10 @@ class AdminOrders extends Component
     use WithPagination;
 
     public string $search      = '';
-    public string $statusFilter = '';
+    public string $decisionFilter = '';
 
     public function updatingSearch(): void { $this->resetPage(); }
-    public function updatingStatusFilter(): void { $this->resetPage(); }
-
-    public function updateStatus(int $orderId, string $status): void
-    {
-        Order::findOrFail($orderId)->update(['status' => $status]);
-        $this->dispatch('notify', message: 'Order status updated!');
-    }
+    public function updatingDecisionFilter(): void { $this->resetPage(); }
 
     public function approveOrder(int $orderId): void
     {
@@ -35,6 +29,11 @@ class AdminOrders extends Component
         }
 
         $order = Order::findOrFail($orderId);
+
+        if ($order->status === 'cancelled') {
+            $this->dispatch('notify', message: 'Order was cancelled by the customer.');
+            return;
+        }
 
         if ($order->approved_at) {
             return;
@@ -75,6 +74,11 @@ class AdminOrders extends Component
 
         $order = Order::findOrFail($orderId);
 
+        if ($order->status === 'cancelled') {
+            $this->dispatch('notify', message: 'Order was cancelled by the customer.');
+            return;
+        }
+
         if ($order->rejected_at) {
             return;
         }
@@ -104,16 +108,37 @@ class AdminOrders extends Component
 
     public function render()
     {
-        $orders = Order::with(['user', 'approvedBy', 'rejectedBy'])
+        $ordersQuery = Order::with(['user', 'approvedBy', 'rejectedBy', 'cancelledBy'])
             ->when($this->search, fn($q) =>
                 $q->whereHas('user', fn($q2) =>
                     $q2->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('email', 'like', '%' . $this->search . '%')
                 )->orWhere('id', 'like', '%' . $this->search . '%')
             )
-            ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-            ->latest()
-            ->paginate(15);
+            ->latest();
+
+        if ($this->decisionFilter === 'cancelled') {
+            $ordersQuery->where('status', 'cancelled');
+        } elseif (in_array($this->decisionFilter, ['pending', 'approved', 'rejected'], true)) {
+            $ordersQuery->where('status', '!=', 'cancelled');
+
+            if (Schema::hasColumn('orders', 'approval_status')) {
+                $ordersQuery->where('approval_status', $this->decisionFilter);
+            } elseif ($this->decisionFilter === 'approved' && Schema::hasColumn('orders', 'approved_at')) {
+                $ordersQuery->whereNotNull('approved_at');
+            } elseif ($this->decisionFilter === 'rejected' && Schema::hasColumn('orders', 'rejected_at')) {
+                $ordersQuery->whereNotNull('rejected_at');
+            } elseif ($this->decisionFilter === 'pending') {
+                if (Schema::hasColumn('orders', 'approved_at')) {
+                    $ordersQuery->whereNull('approved_at');
+                }
+                if (Schema::hasColumn('orders', 'rejected_at')) {
+                    $ordersQuery->whereNull('rejected_at');
+                }
+            }
+        }
+
+        $orders = $ordersQuery->paginate(15);
 
         return view('livewire.admin.admin-orders', compact('orders'))
             ->layout('components.admin-layout', [

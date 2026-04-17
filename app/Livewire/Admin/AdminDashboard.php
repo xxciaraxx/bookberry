@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\CartItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AdminDashboard extends Component
 {
@@ -32,10 +33,16 @@ class AdminDashboard extends Component
         $totalProducts = Product::count();
         $activeProducts = Product::where('is_active', true)->count();
 
-        $pendingOrders = Order::where('status', 'pending')->count();
+        $pendingOrdersQuery = Order::query()->where('status', '!=', 'cancelled');
+        if (Schema::hasColumn('orders', 'approval_status')) {
+            $pendingOrdersQuery->where('approval_status', 'pending');
+        } elseif (Schema::hasColumn('orders', 'approved_at') && Schema::hasColumn('orders', 'rejected_at')) {
+            $pendingOrdersQuery->whereNull('approved_at')->whereNull('rejected_at');
+        }
+        $pendingOrders = $pendingOrdersQuery->count();
 
         // â”€â”€ Recent Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        $recentOrders = Order::with('user')
+        $recentOrders = Order::with(['user', 'approvedBy', 'rejectedBy', 'cancelledBy'])
             ->latest()
             ->take(8)
             ->get();
@@ -57,9 +64,19 @@ class AdminDashboard extends Component
             ->get();
 
         // â”€â”€ Orders by Status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        $ordersByStatus = Order::select('status', DB::raw('count(*) as count'))
-            ->groupBy('status')
-            ->pluck('count', 'status');
+        if (Schema::hasColumn('orders', 'approval_status')) {
+            $ordersByStatus = Order::selectRaw("CASE WHEN status = 'cancelled' THEN 'cancelled' ELSE approval_status END as decision, COUNT(*) as count")
+                ->groupBy('decision')
+                ->pluck('count', 'decision');
+        } elseif (Schema::hasColumn('orders', 'approved_at') && Schema::hasColumn('orders', 'rejected_at')) {
+            $ordersByStatus = Order::selectRaw("CASE WHEN status = 'cancelled' THEN 'cancelled' WHEN approved_at IS NOT NULL THEN 'approved' WHEN rejected_at IS NOT NULL THEN 'rejected' ELSE 'pending' END as decision, COUNT(*) as count")
+                ->groupBy('decision')
+                ->pluck('count', 'decision');
+        } else {
+            $ordersByStatus = Order::selectRaw("CASE WHEN status = 'cancelled' THEN 'cancelled' ELSE 'pending' END as decision, COUNT(*) as count")
+                ->groupBy('decision')
+                ->pluck('count', 'decision');
+        }
 
         // â”€â”€ Revenue by Category â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $revenueByCategory = DB::table('order_items')

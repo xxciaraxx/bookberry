@@ -11,6 +11,8 @@ class Order extends Model
         'total_amount',
         'status',
         'approval_status',
+        'cancelled_at',
+        'cancelled_by',
         'shipping_address',
         'approved_at',
         'approved_by',
@@ -22,6 +24,7 @@ class Order extends Model
         'total_amount' => 'decimal:2',
         'approved_at'  => 'datetime',
         'rejected_at'  => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     public function user()
@@ -42,5 +45,10 @@ class Order extends Model
     public function rejectedBy()
     {
         return $this->belongsTo(User::class, 'rejected_by');
+    }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 }

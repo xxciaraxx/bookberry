@@ -90,11 +90,12 @@
                                 <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-gray-400">{{ auth()->user()->email }}</p>
                             </div>
-                            <a href="{{ route('products') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Browse Books</a>
-                            <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">My Cart</a>
-                            @if(auth()->user()->isAdmin())
-                                <div class="border-t border-purple-50 mt-1">
-                                    <a href="{{ route('admin.dashboard') }}"
+	                            <a href="{{ route('products') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Browse Books</a>
+	                            <a href="{{ route('cart') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">My Cart</a>
+	                            <a href="{{ route('my-orders') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">My Orders</a>
+	                            @if(auth()->user()->isAdmin())
+	                                <div class="border-t border-purple-50 mt-1">
+	                                    <a href="{{ route('admin.dashboard') }}"
                                         class="block px-4 py-2 text-sm font-medium hover:bg-purple-50"
                                         style="color: var(--bb-purple);">Admin Panel</a>
                                 </div>
@@ -136,10 +137,11 @@
                 <ul class="space-y-1.5 text-sm text-white/60">
                     <li><a href="{{ route('home') }}" class="hover:text-white transition">Home</a></li>
                     <li><a href="{{ route('products') }}" class="hover:text-white transition">Browse Books</a></li>
-                    @auth
-                        <li><a href="{{ route('cart') }}" class="hover:text-white transition">My Cart</a></li>
-                    @endauth
-                </ul>
+	                    @auth
+	                        <li><a href="{{ route('cart') }}" class="hover:text-white transition">My Cart</a></li>
+	                        <li><a href="{{ route('my-orders') }}" class="hover:text-white transition">My Orders</a></li>
+	                    @endauth
+	                </ul>
             </div>
             <div>
                 <h4 class="text-sm font-semibold text-white/80 mb-3">Categories</h4>

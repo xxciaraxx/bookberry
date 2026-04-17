@@ -131,10 +131,10 @@
 
                 @php
                     $statusConfig = [
-                        'pending'    => ['🟡', '#D97706', '#FEF3C7', 'Pending'],
-                        'processing' => ['🔵', '#2563EB', '#EFF6FF', 'Processing'],
-                        'completed'  => ['🟢', '#16A34A', '#F0FDF4', 'Completed'],
-                        'cancelled'  => ['🔴', '#DC2626', '#FEF2F2', 'Cancelled'],
+                        'pending'   => ['🟡', '#D97706', '#FEF3C7', 'For approval'],
+                        'approved'  => ['🟢', '#16A34A', '#F0FDF4', 'Approved'],
+                        'rejected'  => ['🔴', '#DC2626', '#FEF2F2', 'Rejected'],
+                        'cancelled' => ['⚪', '#374151', '#F3F4F6', 'Cancelled'],
                     ];
                     $grandTotal = $ordersByStatus->sum() ?: 1;
                 @endphp
@@ -248,19 +248,32 @@
                                         ₱{{ number_format($order->total_amount, 2) }}
                                     </td>
                                     <td class="px-5 py-3">
-                                        @php
-                                            $sc = match($order->status) {
-                                                'pending'    => 'background:#FEF3C7; color:#92400E;',
-                                                'processing' => 'background:#EFF6FF; color:#1E40AF;',
-                                                'completed'  => 'background:#F0FDF4; color:#166534;',
-                                                'cancelled'  => 'background:#FEF2F2; color:#991B1B;',
-                                                default      => 'background:#F3F4F6; color:#374151;',
-                                            };
-                                        @endphp
-                                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="{{ $sc }}">
-                                            {{ ucfirst($order->status) }}
-                                        </span>
-                                    </td>
+	                                        @php
+	                                            $approvalStatus = $order->approval_status
+	                                                ?? ($order->approved_at ? 'approved' : ($order->rejected_at ? 'rejected' : 'pending'));
+	                                            $decisionStatus = $order->status === 'cancelled' ? 'cancelled' : $approvalStatus;
+	                                            $decisionLabel = match ($decisionStatus) {
+	                                                'approved' => 'Approved',
+	                                                'rejected' => 'Rejected',
+	                                                'cancelled' => 'Cancelled',
+	                                                default => 'For approval',
+	                                            };
+	                                            $decisionStyle = match ($decisionStatus) {
+	                                                'approved' => 'background:#F0FDF4; color:#166534;',
+	                                                'rejected' => 'background:#FEF2F2; color:#991B1B;',
+	                                                'cancelled' => 'background:#F3F4F6; color:#374151;',
+	                                                default => 'background:#FEF3C7; color:#92400E;',
+	                                            };
+	                                        @endphp
+	                                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="{{ $decisionStyle }}">
+	                                            {{ $decisionLabel }}
+	                                        </span>
+	                                        @if($decisionStatus === 'cancelled')
+	                                            <div class="text-[10px] text-gray-400 mt-1 leading-tight">
+	                                                Cancelled by customer
+	                                            </div>
+	                                        @endif
+	                                    </td>
                                     <td class="px-5 py-3 text-xs text-gray-400">
                                         {{ $order->created_at->diffForHumans() }}
                                     </td>

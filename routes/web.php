@@ -6,6 +6,7 @@ use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\Admin\AdminOrders;
 use App\Livewire\Admin\AdminProductManager;
 use App\Livewire\CartComponent;
+use App\Livewire\CustomerOrders;
 use App\Livewire\CheckoutComponent;
 use App\Livewire\LandingPage;
 use App\Livewire\ProductDetail;
@@ -21,6 +22,7 @@ Route::get('/products/{product}', ProductDetail::class)->name('product.show');
 Route::middleware('auth')->group(function () {
     Route::get('/cart', CartComponent::class)->name('cart');
     Route::get('/checkout', CheckoutComponent::class)->name('checkout');
+    Route::get('/my-orders', CustomerOrders::class)->name('my-orders');
 
     Route::post('/logout', function (Logout $logout) {
         $logout();
